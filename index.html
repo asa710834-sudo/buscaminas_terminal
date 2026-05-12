@@ -2,15 +2,19 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscaminas Ajedrez</title>
+    <title>Buscaminas Pro - Banderas</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <h1>Buscaminas</h1>
+    
+    <!-- Nuevo contador de minas -->
+    <div class="marcador">
+        Minas restantes: <span id="contador-banderas">15</span>
+    </div>
+
     <div id="tablero" class="tablero"></div>
-    <button id="reset-btn" class="btn-primary">Reiniciar Juego</button>
+    <button id="reset-btn" class="btn-primary">Reiniciar</button>
 
     <script src="logic.js"></script>
     <script src="web_view.js"></script>

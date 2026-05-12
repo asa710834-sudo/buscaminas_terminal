@@ -6,6 +6,7 @@ class Buscaminas {
         this.tablero = [];
         this.gameOver = false;
         this.minasColocadas = false;
+        this.banderasColocadas = 0; // Contador de banderas
         this.inicializarTablero();
     }
 
@@ -14,6 +15,7 @@ class Buscaminas {
             Array.from({ length: this.columnas }, () => ({
                 esMina: false,
                 revelada: false,
+                bandera: false, // Propiedad nueva
                 minasCerca: 0
             }))
         );
@@ -24,13 +26,9 @@ class Buscaminas {
         while (colocadas < this.numMinas) {
             let f = Math.floor(Math.random() * this.filas);
             let c = Math.floor(Math.random() * this.columnas);
-            
-            // Calculamos la distancia al primer clic
             let distF = Math.abs(f - filaExcluida);
             let distC = Math.abs(c - colExcluida);
 
-            // REGLA DE ORO: No ponemos minas en el cuadro 3x3 del primer clic
-            // Esto garantiza que el primer clic sea SIEMPRE un "0" y se abra una zona.
             if (!this.tablero[f][c].esMina && (distF > 1 || distC > 1)) {
                 this.tablero[f][c].esMina = true;
                 colocadas++;
@@ -63,8 +61,22 @@ class Buscaminas {
         return count;
     }
 
-    revelar(f, c) {
+    // Función para poner/quitar bandera
+    alternarBandera(f, c) {
         if (this.gameOver || this.tablero[f][c].revelada) return;
+        
+        const celda = this.tablero[f][c];
+        if (!celda.bandera) {
+            celda.bandera = true;
+            this.banderasColocadas++;
+        } else {
+            celda.bandera = false;
+            this.banderasColocadas--;
+        }
+    }
+
+    revelar(f, c) {
+        if (this.gameOver || this.tablero[f][c].revelada || this.tablero[f][c].bandera) return;
         
         if (!this.minasColocadas) {
             this.colocarMinas(f, c);
@@ -84,9 +96,7 @@ class Buscaminas {
             for (let j = -1; j <= 1; j++) {
                 let nf = f + i, nc = c + j;
                 if (nf >= 0 && nf < this.filas && nc >= 0 && nc < this.columnas) {
-                    if (!this.tablero[nf][nc].revelada) {
-                        this.revelar(nf, nc);
-                    }
+                    if (!this.tablero[nf][nc].revelada) this.revelar(nf, nc);
                 }
             }
         }
