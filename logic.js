@@ -63,6 +63,8 @@ contador++;
 }
 }
 }
-return contador;
+    return contador;
+  }
 }
-}
+
+module.exports = Buscaminas;
