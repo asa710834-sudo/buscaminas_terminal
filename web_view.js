@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filas = 10;
     const columnas = 10;
     const minas = 15;
-    const juego = new Buscaminas(filas, columnas, minas);
+    let juego = new Buscaminas(filas, columnas, minas);
     const contenedor = document.getElementById('tablero');
 
     function renderizar() {
@@ -15,30 +15,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 const div = document.createElement('div');
                 div.classList.add('celda');
 
-                // Lógica de ajedrez puro (0101 / 1010)
-                if ((f + c) % 2 === 0) {
-                    div.classList.add('clara');
-                } else {
-                    div.classList.add('oscura');
-                }
+                // Patrón de ajedrez
+                div.classList.add((f + c) % 2 === 0 ? 'clara' : 'oscura');
 
                 if (celdaData.revelada) {
                     div.classList.add('revelada');
                     if (celdaData.esMina) {
                         div.innerText = '💣';
-                        div.style.backgroundColor = '#ff4d4d'; 
+                        div.classList.add('mina');
                     } else if (celdaData.minasCerca > 0) {
                         div.innerText = celdaData.minasCerca;
                         div.classList.add(`num-${celdaData.minasCerca}`);
+                    } else {
+                        // Es un cero, lo dejamos vacío pero con estilo de revelado
+                        div.innerText = '';
                     }
                 }
 
                 div.addEventListener('click', () => {
                     if (!juego.gameOver) {
                         juego.revelar(f, c);
-                        renderizar();
+                        renderizar(); // Volvemos a dibujar todo el tablero actualizado
+                        
                         if (juego.gameOver && celdaData.esMina) {
-                            setTimeout(() => alert("💥 ¡BOOM! Has perdido."), 10);
+                            setTimeout(() => alert("¡BOOM! Has perdido"), 50);
                         }
                     }
                 });
@@ -48,6 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Botón de reiniciar
+    const resetBtn = document.getElementById('reset-btn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            location.reload();
+        });
+    }
+
     renderizar();
-    document.getElementById('reset-btn').onclick = () => location.reload();
 });

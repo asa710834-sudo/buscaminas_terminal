@@ -5,6 +5,7 @@ class Buscaminas {
         this.numMinas = numMinas;
         this.tablero = [];
         this.gameOver = false;
+        this.minasColocadas = false;
         this.inicializarTablero();
     }
 
@@ -16,20 +17,27 @@ class Buscaminas {
                 minasCerca: 0
             }))
         );
-        this.colocarMinas();
-        this.calcularNumeros();
     }
 
-    colocarMinas() {
+    colocarMinas(filaExcluida, colExcluida) {
         let colocadas = 0;
         while (colocadas < this.numMinas) {
             let f = Math.floor(Math.random() * this.filas);
             let c = Math.floor(Math.random() * this.columnas);
-            if (!this.tablero[f][c].esMina) {
+            
+            // Calculamos la distancia al primer clic
+            let distF = Math.abs(f - filaExcluida);
+            let distC = Math.abs(c - colExcluida);
+
+            // REGLA DE ORO: No ponemos minas en el cuadro 3x3 del primer clic
+            // Esto garantiza que el primer clic sea SIEMPRE un "0" y se abra una zona.
+            if (!this.tablero[f][c].esMina && (distF > 1 || distC > 1)) {
                 this.tablero[f][c].esMina = true;
                 colocadas++;
             }
         }
+        this.calcularNumeros();
+        this.minasColocadas = true;
     }
 
     calcularNumeros() {
@@ -57,7 +65,13 @@ class Buscaminas {
 
     revelar(f, c) {
         if (this.gameOver || this.tablero[f][c].revelada) return;
+        
+        if (!this.minasColocadas) {
+            this.colocarMinas(f, c);
+        }
+
         this.tablero[f][c].revelada = true;
+        
         if (this.tablero[f][c].esMina) {
             this.gameOver = true;
         } else if (this.tablero[f][c].minasCerca === 0) {
@@ -70,14 +84,15 @@ class Buscaminas {
             for (let j = -1; j <= 1; j++) {
                 let nf = f + i, nc = c + j;
                 if (nf >= 0 && nf < this.filas && nc >= 0 && nc < this.columnas) {
-                    if (!this.tablero[nf][nc].revelada) this.revelar(nf, nc);
+                    if (!this.tablero[nf][nc].revelada) {
+                        this.revelar(nf, nc);
+                    }
                 }
             }
         }
     }
 }
 
-// Esto evita errores en el navegador
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = Buscaminas;
 }
