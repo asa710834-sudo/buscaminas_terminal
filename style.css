@@ -1,104 +1,52 @@
-:root {
-    --bg-color: #f0f2f5;
-    --panel-color: #ffffff;
-    --border-color: #d1d5db;
-    --cell-unrevealed: #e5e7eb;
-    --cell-revealed: #f9fafb;
-    --accent-color: #3b82f6;
-    --mine-color: #ef4444;
-}
-
 body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background-color: var(--bg-color);
-    margin: 0;
+    background-color: #f0f0f0;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    min-height: 100vh;
-    touch-action: manipulation; /* Optimiza para toques */
+    font-family: sans-serif;
+    margin-top: 50px;
 }
-
-.game-container {
-    background: var(--panel-color);
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    text-align: center;
-}
-
-header h1 {
-    margin: 0 0 1rem 0;
-    color: #1f2937;
-}
-
-.stats {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-}
-
-.stat-box {
-    background: #1f2937;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-}
-
-.stat-box .label { font-size: 0.7rem; display: block; opacity: 0.8; }
-.stat-box .value { font-size: 1.2rem; font-weight: bold; }
 
 .tablero {
     display: grid;
-    gap: 4px; /* Espacio entre celdas */
-    background-color: var(--border-color);
-    padding: 4px;
-    border-radius: 0.4rem;
-    margin: 0 auto;
-    /* El número de columnas se controla desde JS */
+    gap: 1px;           /* Esto crea los bordes negros internos */
+    background-color: #000; /* Color de los bordes internos */
+    border: 3px solid #000; /* Borde exterior grueso */
+    width: fit-content;
 }
 
 .celda {
-    width: 40px;  /* Tamaño ideal para dedos */
+    width: 40px;
     height: 40px;
-    background-color: var(--cell-unrevealed);
-    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     cursor: pointer;
-    transition: all 0.1s;
     user-select: none;
 }
 
-.celda:active {
-    transform: scale(0.9);
-    background-color: #d1d5db;
-}
+/* Colores de ajedrez */
+.celda.clara { background-color: #ffffff; }
+.celda.oscura { background-color: #d1d5db; }
 
+/* Celda revelada */
 .celda.revelada {
-    background-color: var(--cell-revealed);
+    background-color: #e5e7eb !important; 
     cursor: default;
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
 }
 
-.celda.mina {
-    background-color: var(--mine-color);
-    color: white;
-}
+/* Colores para los números */
+.num-1 { color: blue; }
+.num-2 { color: green; }
+.num-3 { color: red; }
 
 .btn-primary {
-    margin-top: 1.5rem;
-    padding: 0.8rem 1.5rem;
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
+    margin-top: 20px;
+    padding: 10px 20px;
     font-weight: bold;
     cursor: pointer;
-    transition: background 0.2s;
+    border: 2px solid #000;
+    background: white;
 }
-
-.btn-primary:hover { background-color: #2563eb; }
