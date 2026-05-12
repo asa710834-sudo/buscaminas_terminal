@@ -5,7 +5,7 @@ class Buscaminas {
         this.numMinas = numMinas;
         this.tablero = [];
         this.gameOver = false;
-        this.victoria = false; // Nueva bandera de victoria
+        this.victoria = false;
         this.minasColocadas = false;
         this.banderasColocadas = 0;
         this.inicializarTablero();
@@ -19,13 +19,19 @@ class Buscaminas {
         );
     }
 
-    colocarMinas(filaExcluida, colExcluida) {
+    colocarMinas(fExcluir, cExcluir) {
         let colocadas = 0;
         while (colocadas < this.numMinas) {
             let f = Math.floor(Math.random() * this.filas);
             let c = Math.floor(Math.random() * this.columnas);
-            if (!this.tablero[f][c].esMina && (Math.abs(f - filaExcluida) > 1 || Math.abs(c - colExcluida) > 1)) {
-                this.tablero[f][c].esMina = true; colocadas++;
+            
+            // Hueco de 3x3 seguro alrededor del primer clic
+            let distF = Math.abs(f - fExcluir);
+            let distC = Math.abs(c - cExcluir);
+
+            if (!this.tablero[f][c].esMina && (distF > 1 || distC > 1)) {
+                this.tablero[f][c].esMina = true;
+                colocadas++;
             }
         }
         this.calcularNumeros();
@@ -59,8 +65,6 @@ class Buscaminas {
         if (this.gameOver || this.victoria || this.tablero[f][c].revelada) return;
         
         const celda = this.tablero[f][c];
-        
-        // Solo permite poner bandera si no ha llegado al límite de minas
         if (!celda.bandera && this.banderasColocadas < this.numMinas) {
             celda.bandera = true;
             this.banderasColocadas++;
@@ -80,9 +84,7 @@ class Buscaminas {
         if (this.tablero[f][c].esMina) {
             this.gameOver = true;
         } else {
-            if (this.tablero[f][c].minasCerca === 0) {
-                this.revelarVacias(f, c);
-            }
+            if (this.tablero[f][c].minasCerca === 0) this.revelarVacias(f, c);
             this.verificarVictoria();
         }
     }
@@ -99,16 +101,16 @@ class Buscaminas {
     }
 
     verificarVictoria() {
-        let celdasPorRevelar = 0;
+        let celdasSegurasPorRevelar = 0;
         for (let f = 0; f < this.filas; f++) {
             for (let c = 0; c < this.columnas; c++) {
                 if (!this.tablero[f][c].esMina && !this.tablero[f][c].revelada) {
-                    celdasPorRevelar++;
+                    celdasSegurasPorRevelar++;
                 }
             }
         }
-        if (celdasPorRevelar === 0) {
-            this.victoria = true;
-        }
+        if (celdasSegurasPorRevelar === 0) this.victoria = true;
     }
 }
+
+if (typeof module !== 'undefined' && module.exports) module.exports = Buscaminas;

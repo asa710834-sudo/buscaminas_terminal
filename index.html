@@ -2,19 +2,24 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Buscaminas Pro - Banderas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscaminas Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <h1>Buscaminas</h1>
     
-    <!-- Nuevo contador de minas -->
     <div class="marcador">
-        Minas restantes: <span id="contador-banderas">15</span>
+        MINAS: <span id="contador-banderas">15</span>
     </div>
 
     <div id="tablero" class="tablero"></div>
-    <button id="reset-btn" class="btn-primary">Reiniciar</button>
+
+    <button id="reset-btn" class="btn-primary">Reiniciar Partida</button>
+
+    <!-- Mensaje de victoria oculto por defecto -->
+    <div id="mensaje-victoria">🏆 ¡VICTORIA!</div>
 
     <script src="logic.js"></script>
     <script src="web_view.js"></script>

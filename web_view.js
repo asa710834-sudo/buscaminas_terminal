@@ -3,20 +3,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const juego = new Buscaminas(filas, columnas, minasTotales);
     const contenedor = document.getElementById('tablero');
     const contadorTexto = document.getElementById('contador-banderas');
+    const mensajeVic = document.getElementById('mensaje-victoria');
 
     function renderizar() {
         contenedor.innerHTML = '';
         contenedor.style.gridTemplateColumns = `repeat(${columnas}, 40px)`;
         
-        contadorTexto.innerText = minasTotales - juego.banderasColocadas;
+        // Al ganar, forzamos el marcador a 0 (estilo pro)
+        contadorTexto.innerText = juego.victoria ? "0" : minasTotales - juego.banderasColocadas;
+
+        if (juego.victoria) {
+            contenedor.classList.add('ganador');
+            mensajeVic.classList.add('visible');
+        }
 
         for (let f = 0; f < filas; f++) {
             for (let c = 0; c < columnas; c++) {
                 const celdaData = juego.tablero[f][c];
                 const div = document.createElement('div');
                 div.classList.add('celda');
-                const tipoColor = (f + c) % 2 === 0 ? 'clara' : 'oscura';
-                div.classList.add(tipoColor);
+                
+                // Aplicar patrón de ajedrez
+                div.classList.add((f + c) % 2 === 0 ? 'clara' : 'oscura');
 
                 if (celdaData.revelada) {
                     div.classList.add('revelada');
@@ -31,21 +39,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     div.innerText = '🚩';
                 }
 
+                // Eventos
                 div.addEventListener('click', () => {
-                    juego.revelar(f, c);
-                    renderizar();
-                    if (juego.victoria) {
-                        setTimeout(() => alert("🏆 ¡FELICIDADES! Has despejado todas las minas."), 100);
-                    }
-                    if (juego.gameOver && celdaData.esMina) {
-                        setTimeout(() => alert("💥 BOOM! Juego terminado."), 100);
+                    if (!juego.gameOver && !juego.victoria) {
+                        juego.revelar(f, c);
+                        renderizar();
                     }
                 });
 
                 div.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
-                    juego.alternarBandera(f, c);
-                    renderizar();
+                    if (!juego.gameOver && !juego.victoria) {
+                        juego.alternarBandera(f, c);
+                        renderizar();
+                    }
                 });
 
                 contenedor.appendChild(div);
