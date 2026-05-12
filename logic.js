@@ -5,18 +5,16 @@ class Buscaminas {
         this.numMinas = numMinas;
         this.tablero = [];
         this.gameOver = false;
+        this.victoria = false; // Nueva bandera de victoria
         this.minasColocadas = false;
-        this.banderasColocadas = 0; // Contador de banderas
+        this.banderasColocadas = 0;
         this.inicializarTablero();
     }
 
     inicializarTablero() {
         this.tablero = Array.from({ length: this.filas }, () =>
             Array.from({ length: this.columnas }, () => ({
-                esMina: false,
-                revelada: false,
-                bandera: false, // Propiedad nueva
-                minasCerca: 0
+                esMina: false, revelada: false, bandera: false, minasCerca: 0
             }))
         );
     }
@@ -26,12 +24,8 @@ class Buscaminas {
         while (colocadas < this.numMinas) {
             let f = Math.floor(Math.random() * this.filas);
             let c = Math.floor(Math.random() * this.columnas);
-            let distF = Math.abs(f - filaExcluida);
-            let distC = Math.abs(c - colExcluida);
-
-            if (!this.tablero[f][c].esMina && (distF > 1 || distC > 1)) {
-                this.tablero[f][c].esMina = true;
-                colocadas++;
+            if (!this.tablero[f][c].esMina && (Math.abs(f - filaExcluida) > 1 || Math.abs(c - colExcluida) > 1)) {
+                this.tablero[f][c].esMina = true; colocadas++;
             }
         }
         this.calcularNumeros();
@@ -61,33 +55,35 @@ class Buscaminas {
         return count;
     }
 
-    // Función para poner/quitar bandera
     alternarBandera(f, c) {
-        if (this.gameOver || this.tablero[f][c].revelada) return;
+        if (this.gameOver || this.victoria || this.tablero[f][c].revelada) return;
         
         const celda = this.tablero[f][c];
-        if (!celda.bandera) {
+        
+        // Solo permite poner bandera si no ha llegado al límite de minas
+        if (!celda.bandera && this.banderasColocadas < this.numMinas) {
             celda.bandera = true;
             this.banderasColocadas++;
-        } else {
+        } else if (celda.bandera) {
             celda.bandera = false;
             this.banderasColocadas--;
         }
     }
 
     revelar(f, c) {
-        if (this.gameOver || this.tablero[f][c].revelada || this.tablero[f][c].bandera) return;
+        if (this.gameOver || this.victoria || this.tablero[f][c].revelada || this.tablero[f][c].bandera) return;
         
-        if (!this.minasColocadas) {
-            this.colocarMinas(f, c);
-        }
-
+        if (!this.minasColocadas) this.colocarMinas(f, c);
+        
         this.tablero[f][c].revelada = true;
         
         if (this.tablero[f][c].esMina) {
             this.gameOver = true;
-        } else if (this.tablero[f][c].minasCerca === 0) {
-            this.revelarVacias(f, c);
+        } else {
+            if (this.tablero[f][c].minasCerca === 0) {
+                this.revelarVacias(f, c);
+            }
+            this.verificarVictoria();
         }
     }
 
@@ -101,8 +97,18 @@ class Buscaminas {
             }
         }
     }
-}
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = Buscaminas;
+    verificarVictoria() {
+        let celdasPorRevelar = 0;
+        for (let f = 0; f < this.filas; f++) {
+            for (let c = 0; c < this.columnas; c++) {
+                if (!this.tablero[f][c].esMina && !this.tablero[f][c].revelada) {
+                    celdasPorRevelar++;
+                }
+            }
+        }
+        if (celdasPorRevelar === 0) {
+            this.victoria = true;
+        }
+    }
 }

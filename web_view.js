@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
         contenedor.innerHTML = '';
         contenedor.style.gridTemplateColumns = `repeat(${columnas}, 40px)`;
         
-        // Actualizar contador: Minas totales menos banderas puestas
         contadorTexto.innerText = minasTotales - juego.banderasColocadas;
 
         for (let f = 0; f < filas; f++) {
@@ -16,7 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const celdaData = juego.tablero[f][c];
                 const div = document.createElement('div');
                 div.classList.add('celda');
-                div.classList.add((f + c) % 2 === 0 ? 'clara' : 'oscura');
+                const tipoColor = (f + c) % 2 === 0 ? 'clara' : 'oscura';
+                div.classList.add(tipoColor);
 
                 if (celdaData.revelada) {
                     div.classList.add('revelada');
@@ -28,19 +28,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         div.classList.add(`num-${celdaData.minasCerca}`);
                     }
                 } else if (celdaData.bandera) {
-                    div.innerText = '🚩'; // Dibujamos la bandera
-                    div.classList.add('bandera-puesta');
+                    div.innerText = '🚩';
                 }
 
-                // Clic izquierdo (Revelar)
                 div.addEventListener('click', () => {
                     juego.revelar(f, c);
                     renderizar();
+                    if (juego.victoria) {
+                        setTimeout(() => alert("🏆 ¡FELICIDADES! Has despejado todas las minas."), 100);
+                    }
+                    if (juego.gameOver && celdaData.esMina) {
+                        setTimeout(() => alert("💥 BOOM! Juego terminado."), 100);
+                    }
                 });
 
-                // Clic derecho (Bandera)
                 div.addEventListener('contextmenu', (e) => {
-                    e.preventDefault(); // Evita que salga el menú del navegador
+                    e.preventDefault();
                     juego.alternarBandera(f, c);
                     renderizar();
                 });
