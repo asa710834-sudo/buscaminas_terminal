@@ -1,65 +1,70 @@
+let juego;
+let configActual = { filas: 8, columnas: 8, minas: 10 };
+
 document.addEventListener('DOMContentLoaded', () => {
-    const filas = 10, columnas = 10, minasTotales = 15;
-    const juego = new Buscaminas(filas, columnas, minasTotales);
+    cambiarDificultad(8, 8, 10);
+    document.getElementById('reset-btn').onclick = () => {
+        cambiarDificultad(configActual.filas, configActual.columnas, configActual.minas);
+    };
+});
+
+function cambiarDificultad(f, c, m) {
+    configActual = { filas: f, columnas: c, minas: m };
+    juego = new Buscaminas(f, c, m);
+    // Limpiar alertas
+    document.getElementById('mensaje-victoria').classList.remove('visible');
+    document.getElementById('mensaje-derrota').classList.remove('visible');
+    renderizar();
+}
+
+function renderizar() {
     const contenedor = document.getElementById('tablero');
     const contadorTexto = document.getElementById('contador-banderas');
-    const mensajeVic = document.getElementById('mensaje-victoria');
+    
+    contenedor.innerHTML = '';
+    contenedor.style.gridTemplateColumns = `repeat(${configActual.columnas}, 35px)`;
+    
+    contadorTexto.innerText = configActual.minas - juego.banderasColocadas;
 
-    function renderizar() {
-        contenedor.innerHTML = '';
-        contenedor.style.gridTemplateColumns = `repeat(${columnas}, 40px)`;
-        
-        // Al ganar, forzamos el marcador a 0 (estilo pro)
-        contadorTexto.innerText = juego.victoria ? "0" : minasTotales - juego.banderasColocadas;
+    if (juego.victoria) document.getElementById('mensaje-victoria').classList.add('visible');
+    if (juego.gameOver) document.getElementById('mensaje-derrota').classList.add('visible');
 
-        if (juego.victoria) {
-            contenedor.classList.add('ganador');
-            mensajeVic.classList.add('visible');
-        }
+    for (let f = 0; f < configActual.filas; f++) {
+        for (let c = 0; c < configActual.columnas; c++) {
+            const celdaData = juego.tablero[f][c];
+            const div = document.createElement('div');
+            div.classList.add('celda');
+            div.classList.add((f + c) % 2 === 0 ? 'clara' : 'oscura');
 
-        for (let f = 0; f < filas; f++) {
-            for (let c = 0; c < columnas; c++) {
-                const celdaData = juego.tablero[f][c];
-                const div = document.createElement('div');
-                div.classList.add('celda');
-                
-                // Aplicar patrón de ajedrez
-                div.classList.add((f + c) % 2 === 0 ? 'clara' : 'oscura');
-
-                if (celdaData.revelada) {
-                    div.classList.add('revelada');
-                    if (celdaData.esMina) {
-                        div.innerText = '💣';
-                        div.classList.add('mina');
-                    } else if (celdaData.minasCerca > 0) {
-                        div.innerText = celdaData.minasCerca;
-                        div.classList.add(`num-${celdaData.minasCerca}`);
-                    }
-                } else if (celdaData.bandera) {
-                    div.innerText = '🚩';
+            if (celdaData.revelada) {
+                div.classList.add('revelada');
+                if (celdaData.esMina) {
+                    div.innerText = '💣';
+                    div.classList.add('mina');
+                } else if (celdaData.minasCerca > 0) {
+                    div.innerText = celdaData.minasCerca;
+                    div.classList.add(`num-${celdaData.minasCerca}`);
                 }
-
-                // Eventos
-                div.addEventListener('click', () => {
-                    if (!juego.gameOver && !juego.victoria) {
-                        juego.revelar(f, c);
-                        renderizar();
-                    }
-                });
-
-                div.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    if (!juego.gameOver && !juego.victoria) {
-                        juego.alternarBandera(f, c);
-                        renderizar();
-                    }
-                });
-
-                contenedor.appendChild(div);
+            } else if (celdaData.bandera) {
+                div.innerText = '🚩';
             }
+
+            div.addEventListener('click', () => {
+                if (!juego.gameOver && !juego.victoria) {
+                    juego.revelar(f, c);
+                    renderizar();
+                }
+            });
+
+            div.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                if (!juego.gameOver && !juego.victoria) {
+                    juego.alternarBandera(f, c);
+                    renderizar();
+                }
+            });
+
+            contenedor.appendChild(div);
         }
     }
-
-    renderizar();
-    document.getElementById('reset-btn').onclick = () => location.reload();
-});
+}

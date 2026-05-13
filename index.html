@@ -10,16 +10,26 @@
 
     <h1>Buscaminas</h1>
     
-    <div class="marcador">
-        MINAS: <span id="contador-banderas">15</span>
+    <div class="menu-dificultad">
+        <button onclick="cambiarDificultad(8, 8, 10)">Fácil</button>
+        <button onclick="cambiarDificultad(12, 12, 20)">Medio</button>
+        <button onclick="cambiarDificultad(16, 16, 40)">Difícil</button>
     </div>
 
-    <div id="tablero" class="tablero"></div>
+    <div class="marcador">
+        MINAS: <span id="contador-banderas">10</span>
+    </div>
 
-    <button id="reset-btn" class="btn-primary">Reiniciar Partida</button>
+    <!-- Contenedor relativo para los mensajes sobre el tablero -->
+    <div class="tablero-container">
+        <div id="tablero" class="tablero"></div>
+        
+        <!-- Carteles de estado -->
+        <div id="mensaje-victoria" class="alerta">🏆 ¡VICTORIA!</div>
+        <div id="mensaje-derrota" class="alerta">💥 ¡DERROTA!</div>
+    </div>
 
-    <!-- Mensaje de victoria oculto por defecto -->
-    <div id="mensaje-victoria">🏆 ¡VICTORIA!</div>
+    <button id="reset-btn" class="btn-primary">Reiniciar Juego</button>
 
     <script src="logic.js"></script>
     <script src="web_view.js"></script>

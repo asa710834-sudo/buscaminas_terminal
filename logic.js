@@ -19,19 +19,13 @@ class Buscaminas {
         );
     }
 
-    colocarMinas(fExcluir, cExcluir) {
+    colocarMinas(fEx, cEx) {
         let colocadas = 0;
         while (colocadas < this.numMinas) {
             let f = Math.floor(Math.random() * this.filas);
             let c = Math.floor(Math.random() * this.columnas);
-            
-            // Hueco de 3x3 seguro alrededor del primer clic
-            let distF = Math.abs(f - fExcluir);
-            let distC = Math.abs(c - cExcluir);
-
-            if (!this.tablero[f][c].esMina && (distF > 1 || distC > 1)) {
-                this.tablero[f][c].esMina = true;
-                colocadas++;
+            if (!this.tablero[f][c].esMina && (Math.abs(f - fEx) > 1 || Math.abs(c - cEx) > 1)) {
+                this.tablero[f][c].esMina = true; colocadas++;
             }
         }
         this.calcularNumeros();
@@ -63,26 +57,21 @@ class Buscaminas {
 
     alternarBandera(f, c) {
         if (this.gameOver || this.victoria || this.tablero[f][c].revelada) return;
-        
         const celda = this.tablero[f][c];
         if (!celda.bandera && this.banderasColocadas < this.numMinas) {
-            celda.bandera = true;
-            this.banderasColocadas++;
+            celda.bandera = true; this.banderasColocadas++;
         } else if (celda.bandera) {
-            celda.bandera = false;
-            this.banderasColocadas--;
+            celda.bandera = false; this.banderasColocadas--;
         }
     }
 
     revelar(f, c) {
         if (this.gameOver || this.victoria || this.tablero[f][c].revelada || this.tablero[f][c].bandera) return;
-        
         if (!this.minasColocadas) this.colocarMinas(f, c);
-        
         this.tablero[f][c].revelada = true;
-        
         if (this.tablero[f][c].esMina) {
             this.gameOver = true;
+            this.revelarTodoAlPerder();
         } else {
             if (this.tablero[f][c].minasCerca === 0) this.revelarVacias(f, c);
             this.verificarVictoria();
@@ -100,17 +89,21 @@ class Buscaminas {
         }
     }
 
-    verificarVictoria() {
-        let celdasSegurasPorRevelar = 0;
+    revelarTodoAlPerder() {
         for (let f = 0; f < this.filas; f++) {
             for (let c = 0; c < this.columnas; c++) {
-                if (!this.tablero[f][c].esMina && !this.tablero[f][c].revelada) {
-                    celdasSegurasPorRevelar++;
-                }
+                if (this.tablero[f][c].esMina) this.tablero[f][c].revelada = true;
             }
         }
-        if (celdasSegurasPorRevelar === 0) this.victoria = true;
+    }
+
+    verificarVictoria() {
+        let seguras = 0;
+        for (let f = 0; f < this.filas; f++) {
+            for (let c = 0; c < this.columnas; c++) {
+                if (!this.tablero[f][c].esMina && !this.tablero[f][c].revelada) seguras++;
+            }
+        }
+        if (seguras === 0) this.victoria = true;
     }
 }
-
-if (typeof module !== 'undefined' && module.exports) module.exports = Buscaminas;
